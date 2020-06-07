@@ -18,12 +18,15 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 // get the game options
-Route::get('gameOption/{id}', 'GameOptionController@show');
+Route::middleware('cors:api')->get('gameOption/{id}', 'GameOptionController@show');
+
+// create the game options
+Route::middleware('cors:api')->post('gameOption', 'GameOptionController@create');
 
 // create the user
-Route::post('user/{email}/{password}', 'UserController@create');
+Route::middleware('cors:api')->post('users', 'AuthController@register'); // Signup
 
 // get the user
-// Route::get('user/{email}/{password}', 'UserController@show');
+Route::middleware('cors:api')->get('users', 'AuthController@login'); // Signin
 
 

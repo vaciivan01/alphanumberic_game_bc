@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\GameOption;
 use App\Http\Resources\GameOption as GameOptionResorce;
+use Illuminate\Support\Facades\Validator;
 
 class GameOptionController extends Controller
 {
@@ -26,7 +27,35 @@ class GameOptionController extends Controller
      */
     public function show($uuid)
     {
-        $gameOption = GameOption::findOrFail($uuid);
+        $gameOption = GameOption::where('uuid', '=', $uuid)->firstOrFail();
         return new GameOptionResorce($gameOption);
+        return $uuid;
+    }
+
+    public function create(Request $request)
+    {
+        $rules = [
+            'id' => 'required',
+            'easy'    => 'required',
+            'medium' => 'required',
+            'hard' => 'required',
+        ];
+
+        $input     = $request->only('id', 'easy','medium','hard');
+        $validator = Validator::make($input, $rules);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'error' => 'something went wrong']);
+        }
+        $data = json_encode([
+            'easy' => $request->easy,
+            'medium' => $request->medium,
+            'hard' => $request->hard,
+            ]
+        );
+
+        $uuid = $request->id;
+        $user     = GameOption::updateOrCreate(['uuid' => $uuid], ['uuid' => $uuid, 'game_option' => $data]);
+        return ['result' => 'success'];
     }
 }
